@@ -11,7 +11,7 @@ function displayInfo(d) {
   `
 }
 
-d3.select('#selectButton').on('change', function() {
+d3.select('#time-range-select').on('change', function() {
   let time_range = d3.select(this).property('value')
   render(time_range)
 })
