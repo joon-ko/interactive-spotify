@@ -2,15 +2,28 @@
 <html>
 <head>
 <title>tracks</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&display=swap" rel="stylesheet">
 <style>
-	.track {
-		margin: 10px;
-	}
-	.container {
+	.top-container {
 		display: flex;
 	}
+	.list-container {
+		display: flex;
+		flex-direction: column;
+		font-family: 'Montserrat', sans-serif;
+		cursor: default;
+	}
+	#title {
+		margin: 10px;
+	}
 	#list {
-		width: 300px;
+		width: 400px;
+		margin: 10px;
+	}
+	#info {
+		margin: 10px;
+		width: 400px;
+		overflow-wrap: break-word;
 	}
 
 </style>
@@ -18,8 +31,12 @@
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 </head>
 <body>
-<div class="container">
-	<div id="list"></div>
+<div class="top-container">
+	<div class="list-container">
+		<div id="title">your top 25 songs (past ~6 months)</div>
+		<div id="list"></div>
+		<div id="info"></div>
+	</div>
 	<svg id="plot"></svg>
 </div>
 <script src="tracks.js"></script>

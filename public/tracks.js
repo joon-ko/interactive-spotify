@@ -1,3 +1,29 @@
+function displayInfo(d) {
+  document.getElementById('info').innerHTML = `
+    <div><b>${d.track.name}</b></div>
+    <div><b>artist:</b> ${getArtists(d.track.artists)}</div>
+    <div><b>album:</b> ${d.track.album.name}</div>
+    <div><b>length:</b> ${formatTime(d.track.duration_ms)}</div>
+    <div><b>global popularity:</b> ${d.track.popularity}</div>
+    <br>
+    <div><b>danceability:</b> ${d.danceability}</div>
+    <div><b>energy:</b> ${d.energy}</div>
+  `
+}
+
+function formatTime(ms) {
+  let total_seconds = Math.floor(ms / 1000)
+  let min = Math.floor(total_seconds / 60)
+  let secs = total_seconds % 60
+  let pad = (secs < 10) ? '0' : ''
+  return `${min}:${pad}${secs}`
+}
+
+function getArtists(list) {
+  let names = list.map(a => a.name)
+  return names.join(', ')
+}
+
 axios.get('/top')
   .then(function (response) {
     let trackData = response.data['audio_features']
@@ -21,21 +47,29 @@ axios.get('/top')
         d3.selectAll('image')
           .attr('opacity', 0.3)
         d3.select(`image#i-${d.index}`)
-          .attr('width', d => s(d.index) + 20)
-          .attr('height', d => s(d.index) + 20)
-          .attr('x', d => x(d.energy) - ((s(d.index) + 20)/2))
-          .attr('y', d => y(d.danceability) - ((s(d.index) + 20)/2))
+          .transition()
+            .duration(200)
+            .ease(d3.easeLinear)
+          .attr('width', d => s(d.index) + 30)
+          .attr('height', d => s(d.index) + 30)
+          .attr('x', d => x(d.energy) - ((s(d.index) + 30)/2))
+          .attr('y', d => y(d.danceability) - ((s(d.index) + 30)/2))
           .attr('opacity', 1.0)
+        displayInfo(d)
       })
       .on('mouseout', function(d) {
         d3.select(this).style('color', 'black');
         d3.select(`image#i-${d.index}`)
+          .transition()
+            .duration(200)
+            .ease(d3.easeLinear)
           .attr('width', d => s(d.index))
           .attr('height', d => s(d.index))
           .attr('x', d => x(d.energy) - (s(d.index)/2))
           .attr('y', d => y(d.danceability) - (s(d.index)/2))
         d3.selectAll('image')
           .attr('opacity', 1.0)
+        document.getElementById('info').innerHTML = ''
       })
 
     console.log(trackData)
@@ -59,8 +93,8 @@ axios.get('/top')
       .range([height - margin.bottom, margin.top])
 
     const s = d3.scaleLinear()
-      .domain([0, 49])
-      .range([100, 30])
+      .domain([0, 24])
+      .range([100, 40])
 
     plot.append('g')
       .attr('transform', `translate(0, ${height - margin.bottom})`)

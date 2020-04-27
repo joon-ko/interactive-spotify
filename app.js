@@ -113,7 +113,7 @@ app.get('/top', function(req, res) {
   let options = {
     url: 'https://api.spotify.com/v1/me/top/tracks?' +
       querystring.stringify({
-        limit: 50,
+        limit: 25,
         time_range: 'medium_term'
       }),
     headers: { 'Authorization': 'Bearer ' + access_token },
