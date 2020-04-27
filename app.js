@@ -110,11 +110,12 @@ app.get('/tracks', function(req, res) {
 });
 
 app.get('/top', function(req, res) {
+  let time_range = req.query.time_range;
   let options = {
     url: 'https://api.spotify.com/v1/me/top/tracks?' +
       querystring.stringify({
         limit: 25,
-        time_range: 'medium_term'
+        time_range: time_range
       }),
     headers: { 'Authorization': 'Bearer ' + access_token },
     json: true
