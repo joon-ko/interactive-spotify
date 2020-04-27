@@ -30,8 +30,8 @@ const stateKey = 'spotify_auth_state';
 
 let app = express();
 
-// app.use(express.static(__dirname + '/public'));
-app.use(cors())
+app.use(express.static(__dirname + '/public'))
+   .use(cors())
    .use(cookieParser());
 
 nunjucks.configure('views', {
@@ -98,11 +98,15 @@ app.get('/callback', function(req, res) {
 
         // use the access token to access the Spotify Web API
         request.get(options, function(error, response, body) {
-          res.render('data.html', body)
+          res.render('data.html', body);
         });
       }
     });
   }
+});
+
+app.get('/tracks', function(req, res) {
+  res.render('tracks.html');
 });
 
 app.get('/top', function(req, res) {
@@ -119,16 +123,23 @@ app.get('/top', function(req, res) {
   request.get(options, function(error, response, body) {
     ids = body.items.map(track => track.id);
     names = body.items.map(track => track.name);
-    let uri_options = {
+    let feature_options = {
       url: `https://api.spotify.com/v1/audio-features?ids=${ids.join(',')}`,
       headers: { 'Authorization': 'Bearer ' + access_token },
       json: true
     };
-    request.get(uri_options, function(error, response, body) {
-      for (let i=0; i<body['audio_features'].length; i++) {
-        body['audio_features'][i].name = names[i]
+    request.get(feature_options, function(error, response, body) {
+      let track_options = {
+        url: `https://api.spotify.com/v1/tracks?ids=${ids.join(',')}`,
+        headers: { 'Authorization': 'Bearer ' + access_token },
+        json: true
       }
-      res.render('tracks.html', body)
+      request.get(track_options, function(error, response, track_body) {
+        for (let i=0; i<body['audio_features'].length; i++) {
+          body['audio_features'][i].track = track_body['tracks'][i]
+        }
+        res.send(body)
+      });
     });
   });
 });

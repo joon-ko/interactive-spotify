@@ -2,28 +2,26 @@
 <html>
 <head>
 <title>tracks</title>
-<script src="tracks.js"></script>
 <style>
 	.track {
-		margin: 20px;
+		margin: 10px;
 	}
+	.container {
+		display: flex;
+	}
+	#list {
+		width: 300px;
+	}
+
 </style>
+<script src="https://d3js.org/d3.v5.min.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 </head>
 <body>
-{% for track in audio_features %}
-<div class="track">
-	<div><b>{{ track.name }}</b></div>
-	<div>tempo: {{ track.tempo }}</div>
-	<div>id: {{ track.id }}</div>
-	<div>acousticness: {{ track.acousticness }}</div>
-	<div>danceability: {{ track.danceability }}</div>
-	<div>duration: {{ track.duration_ms / 1000 }}</div>
-	<div>energy: {{ track.energy }}</div>
-	<div>speechiness: {{ track.speechiness }}</div>
-	<div>instrumentalness: {{ track.instrumentalness }}</div>
-	<div>liveness: {{ track.liveness }}</div>
-	<div>valence: {{ track.valence }}</div>
+<div class="container">
+	<div id="list"></div>
+	<svg id="plot"></svg>
 </div>
-{% endfor %}
+<script src="tracks.js"></script>
 </body>
 </html>
