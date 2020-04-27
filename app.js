@@ -4,9 +4,10 @@ let cors = require('cors');
 let querystring = require('querystring');
 let cookieParser = require('cookie-parser');
 let nunjucks = require('nunjucks')
+require('dotenv').config()
 
 const client_id = '544791d85ebe4e5e80ef49ac39d23001';
-const client_secret = 'd4600b98110a480fa490193a55621a9d';
+const client_secret = process.env.CLIENT_SECRET;
 const redirect_uri = 'http://localhost:8888/callback';
 
 let access_token = null;
@@ -37,6 +38,10 @@ app.use(express.static(__dirname + '/public'))
 nunjucks.configure('views', {
   autoescape: true,
   express: app
+});
+
+app.get('/', function(req, res) {
+  res.redirect('/login')
 });
 
 app.get('/login', function(req, res) {

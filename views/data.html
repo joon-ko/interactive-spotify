@@ -1,13 +1,29 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>data</title>
+<title>data</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&display=swap" rel="stylesheet">
+<style>
+	body {
+		font-family: 'Montserrat', sans-serif;
+	}
+	#container {
+		margin: 10px;
+		display: flex;
+		flex-direction: column;
+	}
+	#profile {
+		margin: 10px 0 10px 0;
+	}
+</style>
 </head>
 <body>
-	<div>welcome {{ display_name }}</div>
-	<div>email: {{ email }}</div>
-	<div>id: {{ id }}</div>
-	<div>uri: {{ uri }}</div>
-	<img src={{ images[0].url }} height="200" width="200">
+	<div id="container">
+		<div></b>hi, {{ display_name }}</b></div>
+		<div><b>email:</b> {{ email }}</div>
+		<div><b>username:</b> {{ id }}</div>
+		<img id="profile" src={{ images[0].url }} height="200" width="200">
+		<a href="/tracks">take me to the viz</a>
+	</div>
 </body>
 </html>

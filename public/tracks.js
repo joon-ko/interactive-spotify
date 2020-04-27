@@ -109,6 +109,7 @@ function render(time_range) {
         .domain([0, 24])
         .range([100, 40])
 
+      // plot axes
       plot.append('g')
         .attr('transform', `translate(0, ${height - margin.bottom})`)
         .call(d3.axisBottom(x))
@@ -146,6 +147,7 @@ function render(time_range) {
           .attr('width', d => s(d.index))
           .attr('height', d => s(d.index))
 
+      // used to bring currently highlighted track to front
       plot.append('use')
         .attr('xlink:href', '#i-0')
     });
