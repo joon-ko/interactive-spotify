@@ -10,7 +10,7 @@ const client_id = '544791d85ebe4e5e80ef49ac39d23001';
 const client_secret = process.env.CLIENT_SECRET;
 const redirect_uri = 'http://localhost:8888/callback';
 
-let access_token = null;
+let access_tokens = new Map();
 
 /**
  * Generates a random string containing numbers and letters
@@ -47,7 +47,9 @@ app.get('/', function(req, res) {
 app.get('/login', function(req, res) {
 
   let state = generateRandomString(16);
+  let uid = generateRandomString(16);
   res.cookie(stateKey, state);
+  res.cookie('uid', uid);
 
   // your application requests authorization
   let scope = 'user-read-private user-read-email user-top-read';
@@ -92,12 +94,12 @@ app.get('/callback', function(req, res) {
 
     request.post(authOptions, function(error, response, body) {
       if (!error && response.statusCode === 200) {
-
-        access_token = body.access_token;
+        let uid = req.cookies['uid'];
+        access_tokens.set(uid, body.access_token);
 
         let options = {
           url: 'https://api.spotify.com/v1/me',
-          headers: { 'Authorization': 'Bearer ' + access_token },
+          headers: { 'Authorization': 'Bearer ' + access_tokens.get(uid) },
           json: true
         };
 
@@ -115,6 +117,7 @@ app.get('/tracks', function(req, res) {
 });
 
 app.get('/top', function(req, res) {
+  let uid = req.cookies['uid'];
   let time_range = req.query.time_range;
   let options = {
     url: 'https://api.spotify.com/v1/me/top/tracks?' +
@@ -122,7 +125,7 @@ app.get('/top', function(req, res) {
         limit: 25,
         time_range: time_range
       }),
-    headers: { 'Authorization': 'Bearer ' + access_token },
+    headers: { 'Authorization': 'Bearer ' + access_tokens.get(uid) },
     json: true
   };
 
@@ -131,13 +134,13 @@ app.get('/top', function(req, res) {
     names = body.items.map(track => track.name);
     let feature_options = {
       url: `https://api.spotify.com/v1/audio-features?ids=${ids.join(',')}`,
-      headers: { 'Authorization': 'Bearer ' + access_token },
+      headers: { 'Authorization': 'Bearer ' + access_tokens.get(uid) },
       json: true
     };
     request.get(feature_options, function(error, response, body) {
       let track_options = {
         url: `https://api.spotify.com/v1/tracks?ids=${ids.join(',')}`,
-        headers: { 'Authorization': 'Bearer ' + access_token },
+        headers: { 'Authorization': 'Bearer ' + access_tokens.get(uid) },
         json: true
       }
       request.get(track_options, function(error, response, track_body) {
