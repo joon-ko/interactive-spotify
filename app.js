@@ -8,7 +8,7 @@ require('dotenv').config()
 
 const client_id = '544791d85ebe4e5e80ef49ac39d23001';
 const client_secret = process.env.CLIENT_SECRET;
-const redirect_uri = 'http://localhost:8888/callback';
+const redirect_uri = 'https://interactive-spotify.herokuapp.com/callback';
 
 let access_tokens = new Map();
 
