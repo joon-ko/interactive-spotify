@@ -1,5 +1,33 @@
 // use savedData when changing axes so you don't have to call the spotify api again
-let savedData = null;
+let savedData = null
+
+// audio object to play 30s preview mp3
+let audio = new Audio()
+let timeout = null
+
+function audioFadeIn(audio, src) {
+  audio.pause()
+  audio.currentTime = 0
+  audio.src = src
+  audio.play()
+
+  let volume = 0
+  let interval = setInterval(function() {
+    volume += 0.05
+    if (volume >= 1) clearInterval(interval)
+    else audio.volume = volume
+  }, 1000/20);
+}
+
+function audioFadeOut(audio) {
+  audio.volume = 1
+  let volume = 1
+  let interval = setInterval(function() {
+    volume -= 0.05
+    if (volume <= 0) clearInterval(interval)
+    else audio.volume = volume
+  }, 1000/20);
+}
 
 const width = 1200
 const height = 950
@@ -45,13 +73,13 @@ d3.select('#x-axis-select').on('change', function() {
   let xField = d3.select(this).property('value')
   let yField = d3.select('#y-axis-select').property('value')
   render(xField, yField)
-});
+})
 
 d3.select('#y-axis-select').on('change', function() {
   let xField = d3.select('#x-axis-select').property('value')
   let yField = d3.select(this).property('value')
   render(xField, yField)
-});
+})
 
 function formatTime(ms) {
   let total_seconds = Math.floor(ms / 1000)
@@ -109,9 +137,13 @@ function render(xField, yField) {
         .attr('y', d => y(d[yField]) - ((s(d.index) + 30)/2))
         .attr('opacity', 1.0)
       displayInfo(d, xField, yField)
+
+      if (timeout !== null) clearTimeout(timeout)
+      audio.volume = 0
+      timeout = setTimeout(audioFadeIn, 500, audio, d.track.preview_url)
     })
     .on('mouseout', function(d) {
-      d3.select(this).style('color', 'black');
+      d3.select(this).style('color', 'black')
       d3.select(`image#i-${d.index}`)
         .transition()
           .duration(200)
@@ -124,6 +156,11 @@ function render(xField, yField) {
         .attr('opacity', 1.0)
       document.getElementById('info').innerHTML = ''
     })
+
+  list.on('mouseout', function(d) {
+    if (timeout !== null) clearTimeout(timeout)
+    audio.pause()
+  })
 
   let plot = d3.select('svg#plot')
     .attr('width', width)
@@ -149,7 +186,7 @@ function render(xField, yField) {
       .attr('dy', '-0.5em')
       .attr('font-size', 12)
       .attr('text-anchor', 'middle')
-      .text(`${xFieldName}`);
+      .text(`${xFieldName}`)
   plot.append('g')
     .attr('transform', `translate(${margin.left}, 0)`)
     .call(d3.axisLeft(y))
@@ -161,7 +198,7 @@ function render(xField, yField) {
       .attr('dy', '-1em')
       .attr('font-size', 12)
       .attr('text-anchor', 'middle')
-      .text(`${yFieldName}`);
+      .text(`${yFieldName}`)
 
   plot.append('g')
       .attr('id', 'points')

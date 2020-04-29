@@ -119,16 +119,16 @@ app.get('/tracks', function(req, res) {
 app.get('/top', function(req, res) {
   let uid = req.cookies['uid'];
   let time_range = req.query.time_range;
+  let url = 'https://api.spotify.com/v1/me/top/tracks?' +
+    querystring.stringify({
+      limit: 25,
+      time_range: time_range
+    })
   let options = {
-    url: 'https://api.spotify.com/v1/me/top/tracks?' +
-      querystring.stringify({
-        limit: 25,
-        time_range: time_range
-      }),
+    url: url,
     headers: { 'Authorization': 'Bearer ' + access_tokens.get(uid) },
     json: true
   };
-
   request.get(options, function(error, response, body) {
     ids = body.items.map(track => track.id);
     names = body.items.map(track => track.name);
