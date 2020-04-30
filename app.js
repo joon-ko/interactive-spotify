@@ -135,8 +135,8 @@ app.get('/playlist', function(req, res) {
   };
   request.get(options, function(error, response, body) {
     if (body['error'] !== undefined) {
-      console.log(`error: ${body['error_description']}`);
-      res.send({'error': `${body['error_description']} :( please try logging into the main page again!`});
+      console.log(`error: ${body['error']['message']}`);
+      res.send({'there was an error :( please try logging into the main page again!'});
     } else {
       ids = body.items.map(t => t.track.id);
       names = body.items.map(t => t.track.name);
@@ -165,8 +165,8 @@ app.get('/playlists', function(req, res) {
   };
   request.get(options, function(error, response, body) {
     if (body['error'] !== undefined) {
-      console.log(`error: ${body['error_description']}`);
-      res.send({'error': `${body['error_description']} :( please try logging into the main page again!`});
+      console.log(`error: ${body['error']['message']}`);
+      res.send({'there was an error :( please try logging into the main page again!'});
     }
     else {
       let playlists = body.items.map(p => {
@@ -195,8 +195,8 @@ app.get('/top', function(req, res) {
   };
   request.get(options, function(error, response, body) {
     if (body['error'] !== undefined) {
-      console.log(`error: ${body['error_description']}`);
-      res.send({'error': `${body['error_description']} :( please try logging into the main page again!`});
+      console.log(`error: ${body['error']['message']}`);
+      res.send({'there was an error :( please try logging into the main page again!'});
     } else {
       ids = body.items.map(track => track.id);
       names = body.items.map(track => track.name);
