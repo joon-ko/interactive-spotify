@@ -41,14 +41,18 @@ const s = d3.scaleLinear()
 function fillPlaylists() {
   axios.get('/playlists')
     .then(function (response) {
-      let playlists = response.data
-      d3.select('#playlist-select')
-        .selectAll('option')
-          .data(playlists)
-        .enter()
-          .append('option')
-        .text(p => p.name)
-        .attr('value', p => p.id)
+      if (response.data['error'] !== undefined) {
+        alert(response.data['error']);
+      } else {
+        let playlists = response.data
+        d3.select('#playlist-select')
+          .selectAll('option')
+            .data(playlists)
+          .enter()
+            .append('option')
+          .text(p => p.name)
+          .attr('value', p => p.id)
+      }
     })
 }
 fillPlaylists()

@@ -9,6 +9,7 @@ require('dotenv').config()
 const client_id = '544791d85ebe4e5e80ef49ac39d23001';
 const client_secret = process.env.CLIENT_SECRET;
 const redirect_uri = 'https://interactive-spotify.herokuapp.com/callback';
+// const redirect_uri = 'http://localhost:8888/callback'
 
 let access_tokens = new Map();
 
@@ -154,17 +155,22 @@ app.get('/playlists', function(req, res) {
   let access_token = access_tokens.get(uid);
   let options = {
     url: 'https://api.spotify.com/v1/me/playlists?limit=50',
-    headers: { 'Authorization': 'Bearer ' + access_tokens.get(uid) },
+    headers: { 'Authorization': 'Bearer ' + access_token },
     json: true
   };
   request.get(options, function(error, response, body) {
-    let playlists = body.items.map(p => {
-      return {
-        id: p.id,
-        name: p.name
-      }
-    });
-    res.send(playlists);
+    if (error) {
+      res.send({'error': 'bad authorization :( please try logging into the main page again!'});
+    }
+    else {
+      let playlists = body.items.map(p => {
+        return {
+          id: p.id,
+          name: p.name
+        }
+      });
+      res.send(playlists);
+    }
   });
 });
 
