@@ -5,26 +5,18 @@ let savedData = null
 let audio = new Audio()
 let timeout = null
 
-function audioFadeIn(audio, src) {
+// either 'top' for top 25, or 'playlist' for a user playlist
+let selected = 'top'
+
+function audioFadeIn(audio) {
   audio.pause()
   audio.currentTime = 0
-  audio.src = src
   audio.play()
 
   let volume = 0
   let interval = setInterval(function() {
     volume += 0.05
     if (volume >= 1) clearInterval(interval)
-    else audio.volume = volume
-  }, 1000/20);
-}
-
-function audioFadeOut(audio) {
-  audio.volume = 1
-  let volume = 1
-  let interval = setInterval(function() {
-    volume -= 0.05
-    if (volume <= 0) clearInterval(interval)
     else audio.volume = volume
   }, 1000/20);
 }
@@ -45,6 +37,22 @@ const s = d3.scaleLinear()
   .domain([0, 24])
   .range([100, 40])
 
+// fill in playlist names
+function fillPlaylists() {
+  axios.get('/playlists')
+    .then(function (response) {
+      let playlists = response.data
+      d3.select('#playlist-select')
+        .selectAll('option')
+          .data(playlists)
+        .enter()
+          .append('option')
+        .text(p => p.name)
+        .attr('value', p => p.id)
+    })
+}
+fillPlaylists()
+
 function displayInfo(d, xField, yField) {
   // rename 'valence' to more meaningful 'positivity'
   xFieldName = (xField === 'valence') ? 'positivity' : xField
@@ -62,11 +70,29 @@ function displayInfo(d, xField, yField) {
   `
 }
 
+d3.select('#playlist-select').on('change', function() {
+  let playlist = d3.select(this).property('value')
+  if (playlist === 'top25') {
+    document.getElementById('time-range-container').style.visibility = 'visible'
+    let time_range = d3.select('#time-range-select').property('value')
+    let xField = d3.select('#x-axis-select').property('value')
+    let yField = d3.select('#y-axis-select').property('value')
+    selected = 'top'
+    renderTop(time_range, xField, yField)
+  } else {
+    document.getElementById('time-range-container').style.visibility = 'hidden'
+    let xField = d3.select('#x-axis-select').property('value')
+    let yField = d3.select('#y-axis-select').property('value')
+    selected = 'playlist'
+    renderPlaylist(playlist, xField, yField)
+  }
+})
+
 d3.select('#time-range-select').on('change', function() {
   let time_range = d3.select(this).property('value')
   let xField = d3.select('#x-axis-select').property('value')
   let yField = d3.select('#y-axis-select').property('value')
-  renderWithCall(time_range, xField, yField)
+  renderTop(time_range, xField, yField)
 })
 
 d3.select('#x-axis-select').on('change', function() {
@@ -94,8 +120,20 @@ function getArtists(list) {
   return names.join(', ')
 }
 
-// render with a fresh API call
-function renderWithCall(time_range, xField, yField) {
+function renderPlaylist(playlist, xField, yField) {
+  axios.get(`/playlist?id=${playlist}`)
+    .then(function (response) {
+      let trackData = response.data['audio_features']
+      for (let i=0; i<trackData.length; i++) {
+        trackData[i].index = i
+      }
+
+      savedData = trackData
+      render(xField, yField)
+    })
+}
+
+function renderTop(time_range, xField, yField) {
   axios.get(`/top?time_range=${time_range}`)
     .then(function (response) {
       let trackData = response.data['audio_features']
@@ -131,16 +169,17 @@ function render(xField, yField) {
         .transition()
           .duration(200)
           .ease(d3.easeLinear)
-        .attr('width', d => s(d.index) + 30)
-        .attr('height', d => s(d.index) + 30)
-        .attr('x', d => x(d[xField]) - ((s(d.index) + 30)/2))
-        .attr('y', d => y(d[yField]) - ((s(d.index) + 30)/2))
+        .attr('width', d => selected === 'top' ? s(d.index) + 30 : 80)
+        .attr('height', d => selected === 'top' ? s(d.index) + 30 : 80)
+        .attr('x', d => x(d[xField]) - (selected === 'top' ? ((s(d.index) + 30)/2) : 40))
+        .attr('y', d => y(d[yField]) - (selected === 'top' ? ((s(d.index) + 30)/2) : 40))
         .attr('opacity', 1.0)
       displayInfo(d, xField, yField)
 
       if (timeout !== null) clearTimeout(timeout)
       audio.volume = 0
-      timeout = setTimeout(audioFadeIn, 500, audio, d.track.preview_url)
+      audio.src = d.track.preview_url
+      timeout = setTimeout(audioFadeIn, 500, audio)
     })
     .on('mouseout', function(d) {
       d3.select(this).style('color', 'black')
@@ -148,10 +187,10 @@ function render(xField, yField) {
         .transition()
           .duration(200)
           .ease(d3.easeLinear)
-        .attr('width', d => s(d.index))
-        .attr('height', d => s(d.index))
-        .attr('x', d => x(d[xField]) - (s(d.index)/2))
-        .attr('y', d => y(d[yField]) - (s(d.index)/2))
+        .attr('width', d => selected === 'top' ? s(d.index) : 50)
+        .attr('height', d => selected === 'top' ? s(d.index) : 50)
+        .attr('x', d => x(d[xField]) - (selected === 'top' ? (s(d.index)/2) : 25))
+        .attr('y', d => y(d[yField]) - (selected === 'top' ? (s(d.index)/2) : 25))
       d3.selectAll('image')
         .attr('opacity', 1.0)
       document.getElementById('info').innerHTML = ''
@@ -207,14 +246,14 @@ function render(xField, yField) {
     .join('image')
       .attr('id', d => `i-${d.index}`)
       .attr('href', d => d.track.album.images[0].url)
-      .attr('x', d => x(d[xField]) - (s(d.index)/2))
-      .attr('y', d => y(d[yField]) - (s(d.index)/2))
-      .attr('width', d => s(d.index))
-      .attr('height', d => s(d.index))
+      .attr('x', d => x(d[xField]) - (selected === 'top' ? (s(d.index)/2) : 25))
+      .attr('y', d => y(d[yField]) - (selected === 'top' ? (s(d.index)/2) : 25))
+      .attr('width', d => selected === 'top' ? s(d.index) : 50)
+      .attr('height', d => selected === 'top' ? s(d.index) : 50)
 
   // used to bring currently highlighted track to front
   plot.append('use')
     .attr('xlink:href', '#i-0')
 }
 
-renderWithCall('medium_term', 'energy', 'danceability')
+renderTop('medium_term', 'energy', 'danceability')

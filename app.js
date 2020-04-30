@@ -52,7 +52,14 @@ app.get('/login', function(req, res) {
   res.cookie('uid', uid);
 
   // your application requests authorization
-  let scope = 'user-read-private user-read-email user-top-read';
+  let scopes = [
+    'user-read-private',
+    'user-read-email',
+    'user-top-read',
+    'playlist-read-private',
+    'playlist-read-collaborative'
+  ];
+  let scope = scopes.join(' ');
   res.redirect('https://accounts.spotify.com/authorize?' +
     querystring.stringify({
       response_type: 'code',
@@ -114,6 +121,51 @@ app.get('/callback', function(req, res) {
 
 app.get('/tracks', function(req, res) {
   res.render('tracks.html');
+});
+
+app.get('/playlist', function(req, res) {
+  let uid = req.cookies['uid'];
+  let access_token = access_tokens.get(uid);
+  let id = req.query.id;
+  let options = {
+    url: `https://api.spotify.com/v1/playlists/${id}/tracks`,
+    headers: { 'Authorization': 'Bearer ' + access_token },
+    json: true
+  };
+  request.get(options, function(error, response, body) {
+    ids = body.items.map(t => t.track.id);
+    names = body.items.map(t => t.track.name);
+    let feature_options = {
+      url: `https://api.spotify.com/v1/audio-features?ids=${ids.join(',')}`,
+      headers: { 'Authorization': 'Bearer ' + access_token },
+      json: true
+    };
+    request.get(feature_options, function(error, response, feature_body) {
+      for (let i=0; i<feature_body['audio_features'].length; i++) {
+        feature_body['audio_features'][i].track = body.items[i].track
+      }
+      res.send(feature_body);
+    });
+  });
+});
+
+app.get('/playlists', function(req, res) {
+  let uid = req.cookies['uid'];
+  let access_token = access_tokens.get(uid);
+  let options = {
+    url: 'https://api.spotify.com/v1/me/playlists?limit=50',
+    headers: { 'Authorization': 'Bearer ' + access_tokens.get(uid) },
+    json: true
+  };
+  request.get(options, function(error, response, body) {
+    let playlists = body.items.map(p => {
+      return {
+        id: p.id,
+        name: p.name
+      }
+    });
+    res.send(playlists);
+  });
 });
 
 app.get('/top', function(req, res) {
