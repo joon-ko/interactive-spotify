@@ -36,6 +36,8 @@ app.use(express.static(__dirname + '/public'))
    .use(cors())
    .use(cookieParser());
 
+app.use('/favicon.ico', express.static('public/favicon.ico'));
+
 nunjucks.configure('views', {
   autoescape: true,
   express: app

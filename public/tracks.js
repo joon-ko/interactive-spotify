@@ -16,9 +16,9 @@ function audioFadeIn(audio) {
   let volume = 0
   let interval = setInterval(function() {
     volume += 0.05
-    if (volume >= 1) clearInterval(interval)
+    if (volume >= 0.5) clearInterval(interval)
     else audio.volume = volume
-  }, 1000/20);
+  }, 1000/40);
 }
 
 const width = 1200
@@ -190,8 +190,10 @@ function render(xField, yField) {
 
       if (timeout !== null) clearTimeout(timeout)
       audio.volume = 0
-      audio.src = d.track.preview_url
-      timeout = setTimeout(audioFadeIn, 500, audio)
+      if (d.track.preview_url !== null) {
+        audio.src = d.track.preview_url
+        timeout = setTimeout(audioFadeIn, 500, audio)
+      }
     })
     .on('mouseout', function(d) {
       d3.select(this).style('color', 'black')
