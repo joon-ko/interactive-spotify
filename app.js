@@ -159,9 +159,9 @@ app.get('/playlists', function(req, res) {
     json: true
   };
   request.get(options, function(error, response, body) {
-    if (error !== undefined) {
-      console.log(`error: ${error}`);
-      res.send({'error': 'bad authorization :( please try logging into the main page again!'});
+    if (body['error'] !== undefined) {
+      console.log(`error: ${body['error_description']}`);
+      res.send({'error': `${body['error_description']} :( please try logging into the main page again!`});
     }
     else {
       let playlists = body.items.map(p => {
