@@ -159,7 +159,8 @@ app.get('/playlists', function(req, res) {
     json: true
   };
   request.get(options, function(error, response, body) {
-    if (error) {
+    if (error !== undefined) {
+      console.log(`error: ${error}`);
       res.send({'error': 'bad authorization :( please try logging into the main page again!'});
     }
     else {
