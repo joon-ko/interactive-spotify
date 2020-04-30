@@ -134,19 +134,24 @@ app.get('/playlist', function(req, res) {
     json: true
   };
   request.get(options, function(error, response, body) {
-    ids = body.items.map(t => t.track.id);
-    names = body.items.map(t => t.track.name);
-    let feature_options = {
-      url: `https://api.spotify.com/v1/audio-features?ids=${ids.join(',')}`,
-      headers: { 'Authorization': 'Bearer ' + access_token },
-      json: true
-    };
-    request.get(feature_options, function(error, response, feature_body) {
-      for (let i=0; i<feature_body['audio_features'].length; i++) {
-        feature_body['audio_features'][i].track = body.items[i].track
-      }
-      res.send(feature_body);
-    });
+    if (body['error'] !== undefined) {
+      console.log(`error: ${body['error_description']}`);
+      res.send({'error': `${body['error_description']} :( please try logging into the main page again!`});
+    } else {
+      ids = body.items.map(t => t.track.id);
+      names = body.items.map(t => t.track.name);
+      let feature_options = {
+        url: `https://api.spotify.com/v1/audio-features?ids=${ids.join(',')}`,
+        headers: { 'Authorization': 'Bearer ' + access_token },
+        json: true
+      };
+      request.get(feature_options, function(error, response, feature_body) {
+        for (let i=0; i<feature_body['audio_features'].length; i++) {
+          feature_body['audio_features'][i].track = body.items[i].track
+        }
+        res.send(feature_body);
+      });
+    }
   });
 });
 
@@ -189,26 +194,31 @@ app.get('/top', function(req, res) {
     json: true
   };
   request.get(options, function(error, response, body) {
-    ids = body.items.map(track => track.id);
-    names = body.items.map(track => track.name);
-    let feature_options = {
-      url: `https://api.spotify.com/v1/audio-features?ids=${ids.join(',')}`,
-      headers: { 'Authorization': 'Bearer ' + access_tokens.get(uid) },
-      json: true
-    };
-    request.get(feature_options, function(error, response, body) {
-      let track_options = {
-        url: `https://api.spotify.com/v1/tracks?ids=${ids.join(',')}`,
+    if (body['error'] !== undefined) {
+      console.log(`error: ${body['error_description']}`);
+      res.send({'error': `${body['error_description']} :( please try logging into the main page again!`});
+    } else {
+      ids = body.items.map(track => track.id);
+      names = body.items.map(track => track.name);
+      let feature_options = {
+        url: `https://api.spotify.com/v1/audio-features?ids=${ids.join(',')}`,
         headers: { 'Authorization': 'Bearer ' + access_tokens.get(uid) },
         json: true
-      }
-      request.get(track_options, function(error, response, track_body) {
-        for (let i=0; i<body['audio_features'].length; i++) {
-          body['audio_features'][i].track = track_body['tracks'][i]
+      };
+      request.get(feature_options, function(error, response, body) {
+        let track_options = {
+          url: `https://api.spotify.com/v1/tracks?ids=${ids.join(',')}`,
+          headers: { 'Authorization': 'Bearer ' + access_tokens.get(uid) },
+          json: true
         }
-        res.send(body)
+        request.get(track_options, function(error, response, track_body) {
+          for (let i=0; i<body['audio_features'].length; i++) {
+            body['audio_features'][i].track = track_body['tracks'][i]
+          }
+          res.send(body)
+        });
       });
-    });
+    }
   });
 });
 

@@ -127,26 +127,34 @@ function getArtists(list) {
 function renderPlaylist(playlist, xField, yField) {
   axios.get(`/playlist?id=${playlist}`)
     .then(function (response) {
-      let trackData = response.data['audio_features']
-      for (let i=0; i<trackData.length; i++) {
-        trackData[i].index = i
-      }
+      if (response.data['error'] !== undefined) {
+        alert(response.data['error']);
+      } else {
+        let trackData = response.data['audio_features']
+        for (let i=0; i<trackData.length; i++) {
+          trackData[i].index = i
+        }
 
-      savedData = trackData
-      render(xField, yField)
+        savedData = trackData
+        render(xField, yField)
+      }
     })
 }
 
 function renderTop(time_range, xField, yField) {
   axios.get(`/top?time_range=${time_range}`)
     .then(function (response) {
-      let trackData = response.data['audio_features']
-      for (let i=0; i<trackData.length; i++) {
-        trackData[i].index = i
-      }
+      if (response.data['error'] !== undefined) {
+        alert(response.data['error']);
+      } else {
+        let trackData = response.data['audio_features']
+        for (let i=0; i<trackData.length; i++) {
+          trackData[i].index = i
+        }
 
-      savedData = trackData
-      render(xField, yField)
+        savedData = trackData
+        render(xField, yField)
+      }
     })
 }
 
