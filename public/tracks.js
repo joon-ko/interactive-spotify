@@ -8,6 +8,8 @@ let timeout = null
 // either 'top' for top 25, or 'playlist' for a user playlist
 let selected = 'top'
 
+let currentlySelected = 0
+
 function audioFadeIn(audio) {
   audio.pause()
   audio.currentTime = 0
@@ -22,7 +24,7 @@ function audioFadeIn(audio) {
 }
 
 const width = 1200
-const height = 950
+const height = 0.9 * window.innerHeight
 const margin = ({top: 10, right: 70, bottom: 40, left: 50})
 
 // most audio features use a 0,1 domain, luckily
@@ -153,6 +155,7 @@ function renderTop(time_range, xField, yField) {
         }
 
         savedData = trackData
+        console.log(savedData)
         render(xField, yField)
       }
     })
@@ -168,24 +171,17 @@ function render(xField, yField) {
     .data(savedData)
     .join('div')
       .text(d => `${d.index + 1}. ${d.track.name}`)
+      .attr('id', d => `l-${d.index}`)
 
   list.selectAll('div')
     .data(savedData)
     .on('mouseover', function(d) {
       d3.select(this).style('color', 'blue');
-      d3.select('use')
-        .attr('xlink:href', `#i-${d.index}`)
       d3.selectAll('image')
         .attr('opacity', 0.3)
-      d3.select(`image#i-${d.index}`)
-        .transition()
-          .duration(200)
-          .ease(d3.easeLinear)
-        .attr('width', d => selected === 'top' ? s(d.index) + 30 : 80)
-        .attr('height', d => selected === 'top' ? s(d.index) + 30 : 80)
-        .attr('x', d => x(d[xField]) - (selected === 'top' ? ((s(d.index) + 30)/2) : 40))
-        .attr('y', d => y(d[yField]) - (selected === 'top' ? ((s(d.index) + 30)/2) : 40))
-        .attr('opacity', 1.0)
+
+      reinsertImage(d.index, xField, yField)
+      expandImage(d, xField, yField)
       displayInfo(d, xField, yField)
 
       if (timeout !== null) clearTimeout(timeout)
@@ -197,16 +193,7 @@ function render(xField, yField) {
     })
     .on('mouseout', function(d) {
       d3.select(this).style('color', 'black')
-      d3.select(`image#i-${d.index}`)
-        .transition()
-          .duration(200)
-          .ease(d3.easeLinear)
-        .attr('width', d => selected === 'top' ? s(d.index) : 50)
-        .attr('height', d => selected === 'top' ? s(d.index) : 50)
-        .attr('x', d => x(d[xField]) - (selected === 'top' ? (s(d.index)/2) : 25))
-        .attr('y', d => y(d[yField]) - (selected === 'top' ? (s(d.index)/2) : 25))
-      d3.selectAll('image')
-        .attr('opacity', 1.0)
+      contractImage(d, xField, yField)
       document.getElementById('info').innerHTML = ''
     })
 
@@ -265,9 +252,96 @@ function render(xField, yField) {
       .attr('width', d => selected === 'top' ? s(d.index) : 50)
       .attr('height', d => selected === 'top' ? s(d.index) : 50)
 
-  // used to bring currently highlighted track to front
-  plot.append('use')
-    .attr('xlink:href', '#i-0')
+  d3.select('g#points').selectAll('image')
+    .data(savedData)
+    .on('mouseover', function(d) {
+      d3.select(`div#l-${d.index}`).style('color', 'blue');
+      d3.selectAll('image')
+        .attr('opacity', 0.3)
+
+      reinsertImage(d.index, xField, yField)
+      expandImage(d, xField, yField)
+      displayInfo(d, xField, yField)
+
+      if (timeout !== null) clearTimeout(timeout)
+      audio.volume = 0
+      if (d.track.preview_url !== null) {
+        audio.src = d.track.preview_url
+        timeout = setTimeout(audioFadeIn, 500, audio)
+      }
+    })
+    .on('mouseout', function(d) {
+      d3.select(`div#l-${d.index}`).style('color', 'black');
+      contractImage(d, xField, yField)
+      document.getElementById('info').innerHTML = ''
+
+      if (timeout !== null) clearTimeout(timeout)
+      audio.pause()
+    })
+}
+
+function expandImage(d, xField, yField) {
+  d3.select(`image#i-${d.index}`)
+    .transition()
+      .duration(200)
+      .ease(d3.easeLinear)
+    .attr('width', selected === 'top' ? s(d.index) + 30 : 80)
+    .attr('height', selected === 'top' ? s(d.index) + 30 : 80)
+    .attr('x', x(d[xField]) - (selected === 'top' ? ((s(d.index) + 30)/2) : 40))
+    .attr('y', y(d[yField]) - (selected === 'top' ? ((s(d.index) + 30)/2) : 40))
+    .attr('opacity', 1.0)
+}
+
+function contractImage(d, xField, yField) {
+  d3.select(`image#i-${d.index}`)
+    .transition()
+      .duration(200)
+      .ease(d3.easeLinear)
+    .attr('width', selected === 'top' ? s(d.index) : 50)
+    .attr('height', selected === 'top' ? s(d.index) : 50)
+    .attr('x', x(d[xField]) - (selected === 'top' ? (s(d.index)/2) : 25))
+    .attr('y', y(d[yField]) - (selected === 'top' ? (s(d.index)/2) : 25))
+  d3.selectAll('image')
+    .attr('opacity', 1.0)
+}
+
+function reinsertImage(index, xField, yField) {
+  let d = savedData[index]
+  d3.select(`image#i-${d.index}`).remove()
+  d3.select('g#points').append('image')
+    .attr('id', `i-${d.index}`)
+    .attr('href', d.track.album.images[0].url)
+    .attr('x', x(d[xField]) - (selected === 'top' ? (s(d.index)/2) : 25))
+    .attr('y', y(d[yField]) - (selected === 'top' ? (s(d.index)/2) : 25))
+    .attr('width', selected === 'top' ? s(d.index) : 50)
+    .attr('height', selected === 'top' ? s(d.index) : 50)
+    .on('mouseover', () => {
+      d3.select(`div#l-${index}`).style('color', 'blue');
+      d3.selectAll('image')
+        .attr('opacity', 0.3)
+
+      if (currentlySelected !== index) {
+        currentlySelected = index
+        reinsertImage(index, xField, yField)
+      }
+      expandImage(d, xField, yField)
+      displayInfo(d, xField, yField)
+
+      if (timeout !== null) clearTimeout(timeout)
+      audio.volume = 0
+      if (d.track.preview_url !== null) {
+        audio.src = d.track.preview_url
+        timeout = setTimeout(audioFadeIn, 500, audio)
+      }
+    })
+    .on('mouseout', () => {
+      d3.select(`div#l-${index}`).style('color', 'black');
+      contractImage(d, xField, yField)
+      document.getElementById('info').innerHTML = ''
+
+      if (timeout !== null) clearTimeout(timeout)
+      audio.pause()
+    })
 }
 
 renderTop('medium_term', 'energy', 'danceability')
