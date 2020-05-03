@@ -34,7 +34,6 @@ const x = d3.scaleLinear()
 const y = d3.scaleLinear()
   .domain([0, 1])
   .range([height - margin.bottom, margin.top])
-
 const s = d3.scaleLinear()
   .domain([0, 24])
   .range([100, 40])
@@ -65,7 +64,7 @@ function displayInfo(d, xField, yField) {
   yFieldName = (yField === 'valence') ? 'positivity' : yField
 
   document.getElementById('info').innerHTML = `
-    <div><b>${d.track.name}</b></div>
+    <div style="color: #1db954;"><b>${d.track.name}</b></div>
     <div><b>artist:</b> ${getArtists(d.track.artists)}</div>
     <div><b>album:</b> ${d.track.album.name}</div>
     <div><b>length:</b> ${formatTime(d.track.duration_ms)}</div>
@@ -176,7 +175,7 @@ function render(xField, yField) {
   list.selectAll('div')
     .data(savedData)
     .on('mouseover', function(d) {
-      d3.select(this).style('color', 'blue');
+      d3.select(this).style('color', '#1db954');
       d3.selectAll('image')
         .attr('opacity', 0.3)
 
@@ -192,7 +191,7 @@ function render(xField, yField) {
       }
     })
     .on('mouseout', function(d) {
-      d3.select(this).style('color', 'black')
+      d3.select(this).style('color', '#fff')
       contractImage(d, xField, yField)
       document.getElementById('info').innerHTML = ''
     })
@@ -219,7 +218,7 @@ function render(xField, yField) {
     .attr('transform', `translate(0, ${height - margin.bottom})`)
     .call(d3.axisBottom(x))
     .append('text')
-      .attr('fill', '#000')
+      .attr('fill', '#fff')
       .attr('transform', 'rotate(0)')
       .attr('y', margin.bottom)
       .attr('x', (width + margin.left)/2)
@@ -231,7 +230,7 @@ function render(xField, yField) {
     .attr('transform', `translate(${margin.left}, 0)`)
     .call(d3.axisLeft(y))
     .append('text')
-      .attr('fill', '#000')
+      .attr('fill', '#fff')
       .attr('transform', 'rotate(-90)')
       .attr('y', -margin.left/2)
       .attr('x', -height/2)
@@ -255,7 +254,7 @@ function render(xField, yField) {
   d3.select('g#points').selectAll('image')
     .data(savedData)
     .on('mouseover', function(d) {
-      d3.select(`div#l-${d.index}`).style('color', 'blue');
+      d3.select(`div#l-${d.index}`).style('color', '#1db954');
       d3.selectAll('image')
         .attr('opacity', 0.3)
 
@@ -271,7 +270,7 @@ function render(xField, yField) {
       }
     })
     .on('mouseout', function(d) {
-      d3.select(`div#l-${d.index}`).style('color', 'black');
+      d3.select(`div#l-${d.index}`).style('color', '#fff');
       contractImage(d, xField, yField)
       document.getElementById('info').innerHTML = ''
 
@@ -316,7 +315,7 @@ function reinsertImage(index, xField, yField) {
     .attr('width', selected === 'top' ? s(d.index) : 50)
     .attr('height', selected === 'top' ? s(d.index) : 50)
     .on('mouseover', () => {
-      d3.select(`div#l-${index}`).style('color', 'blue');
+      d3.select(`div#l-${index}`).style('color', '#1db954');
       d3.selectAll('image')
         .attr('opacity', 0.3)
 
@@ -335,7 +334,7 @@ function reinsertImage(index, xField, yField) {
       }
     })
     .on('mouseout', () => {
-      d3.select(`div#l-${index}`).style('color', 'black');
+      d3.select(`div#l-${index}`).style('color', '#fff');
       contractImage(d, xField, yField)
       document.getElementById('info').innerHTML = ''
 
