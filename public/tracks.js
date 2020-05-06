@@ -8,6 +8,7 @@ let timeout = null
 // either 'top' for top 25, or 'playlist' for a user playlist
 let selected = 'top'
 
+// for bringing the current hovered element to the front
 let currentlySelected = 0
 
 function audioFadeIn(audio) {
@@ -23,18 +24,18 @@ function audioFadeIn(audio) {
   }, 1000/40);
 }
 
-const width = 1200
-const height = 0.9 * window.innerHeight
-const margin = ({top: 10, right: 70, bottom: 40, left: 50})
+let width = 0.6 * window.innerWidth
+let height = 0.9 * window.innerHeight
+const margin = ({top: 40, right: 70, bottom: 40, left: 50})
 
 // most audio features use a 0,1 domain, luckily
-const x = d3.scaleLinear()
+let x = d3.scaleLinear()
   .domain([0, 1])
   .range([margin.left, width - margin.right])
-const y = d3.scaleLinear()
+let y = d3.scaleLinear()
   .domain([0, 1])
   .range([height - margin.bottom, margin.top])
-const s = d3.scaleLinear()
+let s = d3.scaleLinear()
   .domain([0, 24])
   .range([100, 40])
 
@@ -109,6 +110,22 @@ d3.select('#x-axis-select').on('change', function() {
 d3.select('#y-axis-select').on('change', function() {
   let xField = d3.select('#x-axis-select').property('value')
   let yField = d3.select(this).property('value')
+  render(xField, yField)
+})
+
+// resize axes dynamically
+window.addEventListener('resize', () => {
+  console.log('resize')
+  width = 0.6 * window.innerWidth
+  height = 0.9 * window.innerHeight
+  x = d3.scaleLinear()
+    .domain([0, 1])
+    .range([margin.left, width - margin.right])
+  y = d3.scaleLinear()
+    .domain([0, 1])
+    .range([height - margin.bottom, margin.top])
+  let xField = d3.select('#x-axis-select').property('value')
+  let yField = d3.select('#y-axis-select').property('value')
   render(xField, yField)
 })
 

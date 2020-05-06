@@ -4,26 +4,64 @@
 <title>data</title>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&display=swap" rel="stylesheet">
 <style>
-	body {
-		font-family: 'Montserrat', sans-serif;
-	}
-	#container {
-		margin: 10px;
-		display: flex;
-		flex-direction: column;
-	}
-	#profile {
-		margin: 10px 0 10px 0;
-	}
+body {
+	font-family: 'Montserrat', sans-serif;
+	background-color: #191414;
+	color: #fff;
+	padding: 20px;
+}
+a:link {
+	color: white;
+}
+a:visited {
+	color: #ffd1dc;
+}
+#title {
+	font-size: 24px;
+	color: #1db954;
+	margin-bottom: 10px;
+}
+#subtitle {
+	font-size: 18px;
+	margin-bottom: 30px;
+}
+#container {
+	display: flex;
+	flex-direction: column;
+}
+#profile {
+	margin: 10px 0 20px 0;
+}
+#explanation {
+	width: 800px;
+	margin-top: 10px;
+}
+#explanation li {
+	margin-bottom: 10px;
+}
+.green {
+	color: #1db954;
+}
 </style>
 </head>
 <body>
+	<div id="title"><b>interactive spotify</b></div>
+	<div id="subtitle">explore your personal spotify data</div>
 	<div id="container">
-		<div></b>hi, {{ display_name }}</b></div>
-		<div><b>email:</b> {{ email }}</div>
-		<div><b>username:</b> {{ id }}</div>
-		<img id="profile" src={{ images[0].url }} height="200" width="200">
-		<a href="/tracks">take me to the viz</a>
+		<div id></b>hi, {{ id }}!</b> <a href="/tracks">explore your visualization here.</a></div>
+		<img id="profile" src={{ images[0].url }} height="150" width="150">
+	</div>
+	<div id="explanation">
+		<div>this project is a personalized visualization of your spotify playlists, including a generated playlist of your top 25 songs over periods of time. it shows you correlations between <a href="https://developer.spotify.com/documentation/web-api/reference/tracks/get-audio-features/" target="_blank">audio features</a> provided by spotify's API. all audio features are measured on a scale from 0.0 to 1.0. the following descriptions of audio features are provided by spotify:</div>
+		<ul>
+			<li><span class="green"><b>energy</b></span> represents a perceptual measure of intensity and activity. typically, energetic tracks feel fast, loud, and noisy. for example, death metal has high energy, while a bach prelude scores low on the scale. perceptual features contributing to this attribute include dynamic range, perceived loudness, timbre, onset rate, and general entropy.</li>
+			<li><span class="green"><b>danceability</b></span> describes how suitable a track is for dancing based on a combination of musical elements including tempo, rhythm stability, beat strength, and overall regularity. a value of 0.0 is least danceable and 1.0 is most danceable.</li>
+			<li><span class="green"><b>positivity</b></span>, which spotify calls <i>valence</i>, describes the musical positiveness conveyed by a track. tracks with high positivity sound more positive (e.g. happy, cheerful, euphoric), while tracks with low positivity sound more negative (e.g. sad, depressed, angry).</li>
+			<li><span class="green"><b>acousticness</b></span> is a confidence measure of whether the track is acoustic (as opposed to electronic), where 1.0 represents high confidence.</li>
+			<li><span class="green"><b>instrumentalness</b></span> predicts whether a track contains no vocals. “ooh” and “aah” sounds are treated as instrumental in this context. rap or spoken word tracks are clearly “vocal”. the closer the instrumentalness value is to 1.0, the greater likelihood the track contains no vocal content. values above 0.5 are intended to represent instrumental tracks, but confidence is higher as the value approaches 1.0.</li>
+			<li><span class="green"><b>liveness</b></span> detects the presence of an audience in the recording. higher liveness values represent an increased probability that the track was performed live. a value above 0.8 provides strong likelihood that the track is live.</li>
+			<li><span class="green"><b>speechiness</b></span> detects the presence of spoken words in a track. the more exclusively speech-like the recording (e.g. talk show, audio book, poetry), the closer to 1.0 the attribute value. values above 0.66 describe tracks that are probably made entirely of spoken words. values between 0.33 and 0.66 describe tracks that may contain both music and speech, either in sections or layered, including such cases as rap music. values below 0.33 most likely represent music and other non-speech-like tracks.</li>
+		</ul>
 	</div>
 </body>
 </html>
