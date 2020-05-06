@@ -76,6 +76,33 @@ function displayInfo(d, xField, yField) {
   `
 }
 
+function showAverages(data) {
+  count = data.length
+  fields = [
+    'energy', 'danceability', 'valence', 'acousticness', 'instrumentalness', 'liveness', 'speechiness'
+  ]
+  averages = new Map()
+  for (let i=0; i<fields.length; i++) {
+    let sum = 0
+    data.forEach(d => sum += d[fields[i]])
+    let average = Math.round((sum / count) * 1000) / 1000
+    averages.set(fields[i], average)
+  }
+
+  document.getElementById('avgs').innerHTML = `
+    <div style="color: #1db954;"><b>playlist averages</b></div>
+    <ul style="margin: 5px 0 5px 0;">
+      <li><b>energy:</b> ${averages.get('energy')}</li>
+      <li><b>danceability:</b> ${averages.get('danceability')}</li>
+      <li><b>positivity:</b> ${averages.get('valence')}</li>
+      <li><b>acousticness:</b> ${averages.get('acousticness')}</li>
+      <li><b>instrumentalness:</b> ${averages.get('instrumentalness')}</li>
+      <li><b>liveness:</b> ${averages.get('liveness')}</li>
+      <li><b>speechiness:</b> ${averages.get('speechiness')}</li>
+    </ul>
+  `
+}
+
 d3.select('#playlist-select').on('change', function() {
   let playlist = d3.select(this).property('value')
   if (playlist === 'top25') {
@@ -115,7 +142,6 @@ d3.select('#y-axis-select').on('change', function() {
 
 // resize axes dynamically
 window.addEventListener('resize', () => {
-  console.log('resize')
   width = 0.6 * window.innerWidth
   height = 0.9 * window.innerHeight
   x = d3.scaleLinear()
@@ -154,6 +180,7 @@ function renderPlaylist(playlist, xField, yField) {
         }
 
         savedData = trackData
+        showAverages(savedData)
         render(xField, yField)
       }
     })
@@ -171,7 +198,7 @@ function renderTop(time_range, xField, yField) {
         }
 
         savedData = trackData
-        console.log(savedData)
+        showAverages(savedData)
         render(xField, yField)
       }
     })

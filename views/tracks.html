@@ -33,11 +33,15 @@ body {
 #list {
 	margin: 10px;
 	width: 400px;
-	height: 60vh;
+	height: 50vh;
 	overflow-y: auto;
 }
+#avgs {
+	margin: 10px 0 0 10px;
+	width: 400px;
+}
 #info {
-	margin: 10px;
+	margin: 0px 0px 10px 10px;
 	width: 400px;
 	overflow-wrap: break-word;
 }
@@ -50,13 +54,13 @@ body {
 	<div id="list-container">
 		<div id="option-container">
 			<div id="playlist-container">
-				<div>playlist:</div>
+				<div><b>playlist:</b></div>
 				<select id="playlist-select">
 					<option value="top25" selected>your top 25 songs</option>
 				</select>
 			</div>
 			<div id="time-range-container">
-				<div>past...</div>
+				<div><b>past...</b></div>
 				<select id="time-range-select">
 					<option value="short_term">month</option>
 					<option value="medium_term" selected>six months</option>
@@ -65,7 +69,7 @@ body {
 			</div>
 			<br>
 			<div id="x-axis-container">
-				<div>x axis:</div>
+				<div><b>x axis:</b></div>
 				<select id="x-axis-select">
 					<option value="energy" selected>energy</option>
 					<option value="danceability">danceability</option>
@@ -77,7 +81,7 @@ body {
 				</select>
 			</div>
 			<div id="y-axis-container">
-				<div>y axis:</div>
+				<div><b>y axis:</b></div>
 				<select id="y-axis-select">
 					<option value="energy">energy</option>
 					<option value="danceability" selected>danceability</option>
@@ -89,6 +93,7 @@ body {
 				</select>
 			</div>
 		</div>
+		<div id="avgs"></div>
 		<div id="list"></div>
 		<div id="info"></div>
 	</div>
