@@ -2,7 +2,7 @@
 
 ![](title_image.png)
 
-an interactive visualization of your most liked spotify songs, or any album or playlist you wish to search for. uses the [spotify api](https://developer.spotify.com/documentation/web-api/). a spotify account is required for access.
+an interactive visualization of your most liked spotify songs, or any playlist in your library. uses the [spotify api](https://developer.spotify.com/documentation/web-api/). a spotify account is required for access.
 
 ### [paper](https://github.mit.edu/pages/6894-sp20/FP-interactive-spotify/paper.pdf)
 
